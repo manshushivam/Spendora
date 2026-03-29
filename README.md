@@ -1,59 +1,41 @@
-# Spendora
+# 💰 Spendora - Smart Personal Finance Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.1.
+**Spendora** is a professional-grade, local-first financial tracking application built with **Angular 19**. It transforms your raw expense data into actionable insights using advanced budgeting strategies and real-time analytics.
 
-## Development server
+🔗 **[Live Demo](https://manshushivam.github.io/Spendora/)**
 
-To start a local development server, run:
+![Spendora Dashboard](https://raw.githubusercontent.com/manshushivam/Spendora/main/src/assets/preview.png) *(Note: Add a screenshot to assets/preview.png for maximum impact!)*
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## ✨ Key Features
 
-## Code scaffolding
+### 📊 Advanced Analytics
+- **Live KPI Tracking**: Real-time monitoring of total Income, Needs, Wants, and Savings.
+- **Month-over-Month (MoM) Growth**: Automated performance tracking showing percentage changes against previous months.
+- **Dynamic Charting**: Interactive trend lines and distribution charts powered by **ApexCharts**.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 🧠 Smart Budgeting Engine
+- **5-Tier Strategy Support**: Switch between *Standard (50/30/20)*, *Professional*, *Survival*, *Starter*, and *Aggressive* frameworks.
+- **Likely Strategy Recommendation**: A built-in engine that analyzes your actual spending habits and suggests the best-fitting budget framework using Least Squared Error (LSE) logic.
 
-```bash
-ng generate component component-name
-```
+### 🔒 Privacy & Performance
+- **Local-First Processing**: Your financial data never leaves your browser. Parsing is done locally via **SheetJS (XLSX)**.
+- **Glassmorphism UI**: A premium, dark-mode aesthetic designed for focus and clarity.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🛠️ Tech Stack
 
-## Building
+- **Framework**: [Angular 19](https://angular.dev/) (Signals, Reactive UI)
+- **Visuals**: [ApexCharts](https://apexcharts.com/) & [Lucide Icons](https://lucide.dev/)
+- **Data**: [SheetJS (XLSX)](https://sheetjs.com/) for Excel parsing
+- **Styling**: Vanilla CSS (Custom Glassmorphism System)
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## 🚀 Getting Started
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/manshushivam/Spendora.git
