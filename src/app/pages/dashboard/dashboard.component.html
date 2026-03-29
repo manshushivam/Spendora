@@ -23,13 +23,24 @@
         Download Template
       </button>
     </div>
+    
+    <div class="privacy-note">
+      <lucide-icon [name]="icons.ShieldCheck" size="16"></lucide-icon>
+      <span>We do not store your Account Statement! We store nothing!</span>
+    </div>
   </div>
   } @else {
   <!-- Header -->
   <header>
     <div class="brand">
       <h1>Spendora Dashboard</h1>
-      <p>Dashboard for {{ selectedMonths().join(', ') }}</p>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <p style="margin: 0;">Dashboard for {{ selectedMonths().join(', ') }}</p>
+        <span class="privacy-badge">
+          <lucide-icon [name]="icons.ShieldCheck" size="12"></lucide-icon>
+          No Data Stored
+        </span>
+      </div>
     </div>
     <div class="actions">
       <button class="upload-btn" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.875rem;"

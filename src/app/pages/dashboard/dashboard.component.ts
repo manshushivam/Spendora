@@ -8,6 +8,7 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
+  ShieldCheck,
   ArrowUpRight,
   AlertCircle,
   Filter,
@@ -54,7 +55,7 @@ export class DashboardComponent {
 
   // Icons
   icons = {
-    Upload, TrendingUp, TrendingDown, Wallet, ArrowUpRight, AlertCircle, Filter, Search, Download, Check
+    Upload, TrendingUp, TrendingDown, Wallet, ShieldCheck, ArrowUpRight, AlertCircle, Filter, Search, Download, Check
   };
 
   // Derived Data
