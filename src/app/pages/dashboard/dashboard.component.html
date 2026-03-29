@@ -1,0 +1,320 @@
+<div class="dashboard-container">
+  @if (transactions().length === 0) {
+  <div class="empty-state">
+    <div class="brand">
+      <h1>Spendora</h1>
+      <p>Your Financial Control Panel</p>
+    </div>
+    <div class="illustration"
+      style="margin: 3rem 0; background: rgba(59, 130, 246, 0.1); padding: 4rem; border-radius: 50%;">
+      <lucide-icon [name]="icons.Upload" size="64" color="#3b82f6"></lucide-icon>
+    </div>
+    <h2>Get Started</h2>
+    <p>Upload your bank statement (Excel) to see your spending insights and 50/30/20 budget tracking.</p>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <label class="upload-btn">
+        <lucide-icon [name]="icons.Upload" size="20"></lucide-icon>
+        Upload Statement
+        <input type="file" (change)="onFileUpload($event)" accept=".xlsx" style="display: none;">
+      </label>
+      <button class="upload-btn" style="background: rgba(255,255,255,0.05); color: #94a3b8;"
+        (click)="downloadTemplate()">
+        <lucide-icon [name]="icons.Download" size="20"></lucide-icon>
+        Download Template
+      </button>
+    </div>
+  </div>
+  } @else {
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <h1>Spendora Dashboard</h1>
+      <p>Dashboard for {{ selectedMonths().join(', ') }}</p>
+    </div>
+    <div class="actions">
+      <button class="upload-btn" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.875rem;"
+        (click)="downloadTemplate()">
+        <lucide-icon [name]="icons.Download" size="16"></lucide-icon>
+        Template
+      </button>
+      <label class="upload-btn">
+        <lucide-icon [name]="icons.Upload" size="18"></lucide-icon>
+        Update Data
+        <input type="file" (change)="onFileUpload($event)" accept=".xlsx" style="display: none;">
+      </label>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-chips">
+      <span
+        style="color: #64748b; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; text-transform: uppercase; min-width: 80px;">Month:</span>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        @for (month of availableMonths(); track month) {
+        <div class="chip" [class.active]="selectedMonths().includes(month)" (click)="toggleMonth(month)">
+          {{ month }}
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="filter-chips">
+      <span
+        style="color: #64748b; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; text-transform: uppercase; min-width: 80px;">Categories:</span>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        @for (cat of availableCategories(); track cat) {
+        <div class="chip" [class.active]="selectedCategories().includes(cat)" (click)="toggleCategory(cat)">
+          {{ cat }}
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (transactions().length > 0) {
+  <div class="strategy-section">
+    <h2>Budget Strategy</h2>
+    <div class="strategy-list">
+      @for (strat of strategies; track strat.id) {
+      <div class="strat-card" [class.active]="selectedStrategy().id === strat.id" (click)="setStrategy(strat)">
+        <div class="strat-name">{{ strat.name }}</div>
+        <div class="strat-desc">{{ strat.description }}</div>
+        @if (likelyStrategy()?.id === strat.id) {
+        <div class="suggested-badge">Suggested</div>
+        }
+        @if (selectedStrategy().id === strat.id) {
+        <div class="active-icon">
+          <lucide-icon [name]="icons.Check" size="14"></lucide-icon>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card income">
+      <div class="kpi-header">
+        <div class="icon-box"><lucide-icon [name]="icons.TrendingUp" size="20"></lucide-icon></div>
+        <span class="ratio pos">Income</span>
+      </div>
+      <h3>Total Income</h3>
+      <div class="amount">{{ formatCurrency(stats().totalIncome) }}</div>
+    </div>
+
+    <div class="kpi-card need">
+      <div class="kpi-header">
+        <div class="icon-box"><lucide-icon [name]="icons.AlertCircle" size="20"></lucide-icon></div>
+        <span class="ratio" [class.neg]="stats().needsRatio > selectedStrategy().needs"
+          [class.pos]="stats().needsRatio <= selectedStrategy().needs">
+          {{ stats().needsRatio | number:'1.0-0' }}%
+        </span>
+      </div>
+      <h3>Total Need</h3>
+      <div class="amount">{{ formatCurrency(stats().actualNeeds) }}</div>
+    </div>
+
+    <div class="kpi-card want">
+      <div class="kpi-header">
+        <div class="icon-box"><lucide-icon [name]="icons.TrendingDown" size="20"></lucide-icon></div>
+        <span class="ratio" [class.neg]="stats().wantsRatio > selectedStrategy().wants"
+          [class.pos]="stats().wantsRatio <= selectedStrategy().wants">
+          {{ stats().wantsRatio | number:'1.0-0' }}%
+        </span>
+      </div>
+      <h3>Total Want</h3>
+      <div class="amount">{{ formatCurrency(stats().actualWants) }}</div>
+    </div>
+
+    <div class="kpi-card savings">
+      <div class="kpi-header">
+        <div class="icon-box"><lucide-icon [name]="icons.Wallet" size="20"></lucide-icon></div>
+        <span class="ratio" [class.pos]="stats().savingsRatio >= selectedStrategy().savings"
+          [class.neg]="stats().savingsRatio < selectedStrategy().savings">
+          {{ stats().savingsRatio | number:'1.0-0' }}%
+        </span>
+      </div>
+      <h3>Total Saving</h3>
+      <div class="amount">{{ formatCurrency(stats().actualSavings) }}</div>
+    </div>
+  </div>
+
+  @if (chronologicalMonths().length > 1 && latestMonthStats() && growthMetrics()) {
+    <div class="latest-month-section">
+      <h2>
+        <lucide-icon [name]="icons.TrendingUp" size="22" style="color: #3b82f6;"></lucide-icon>
+        Latest Month Performance ({{ latestMonthStats()?.month }})
+      </h2>
+      
+      <div class="kpi-grid">
+        <div class="kpi-card income">
+          <div class="kpi-header">
+            <div class="icon-box"><lucide-icon [name]="icons.TrendingUp" size="20"></lucide-icon></div>
+          </div>
+          <h3>Latest Income</h3>
+          <div class="amount">{{ formatCurrency(latestMonthStats()!.stats.totalIncome) }}</div>
+          <div class="growth-badge" [class.favorable]="growthMetrics()!.income.isFavorable" [class.unfavorable]="!growthMetrics()!.income.isFavorable">
+            <lucide-icon [name]="growthMetrics()!.income.delta >= 0 ? icons.TrendingUp : icons.TrendingDown" size="14"></lucide-icon>
+            {{ growthMetrics()!.income.delta > 0 ? '+' : '' }}{{ growthMetrics()!.income.delta | number:'1.1-1' }}% vs last month
+          </div>
+        </div>
+
+        <div class="kpi-card need">
+          <div class="kpi-header">
+            <div class="icon-box"><lucide-icon [name]="icons.AlertCircle" size="20"></lucide-icon></div>
+            <span class="target-chip">Budget: {{ formatCurrency(latestMonthStats()!.stats.totalIncome * (selectedStrategy().needs / 100)) }}</span>
+          </div>
+          <h3>Latest Need</h3>
+          <div class="amount">{{ formatCurrency(latestMonthStats()!.stats.actualNeeds) }}</div>
+          <div class="growth-badge" [class.favorable]="growthMetrics()!.needs.isFavorable" [class.unfavorable]="!growthMetrics()!.needs.isFavorable">
+            <lucide-icon [name]="growthMetrics()!.needs.delta <= 0 ? icons.TrendingUp : icons.TrendingDown" size="14"></lucide-icon>
+            {{ growthMetrics()!.needs.delta > 0 ? '+' : '' }}{{ growthMetrics()!.needs.delta | number:'1.1-1' }}% vs last month
+          </div>
+        </div>
+
+        <div class="kpi-card want">
+          <div class="kpi-header">
+            <div class="icon-box"><lucide-icon [name]="icons.TrendingDown" size="20"></lucide-icon></div>
+            <span class="target-chip">Budget: {{ formatCurrency(latestMonthStats()!.stats.totalIncome * (selectedStrategy().wants / 100)) }}</span>
+          </div>
+          <h3>Latest Want</h3>
+          <div class="amount">{{ formatCurrency(latestMonthStats()!.stats.actualWants) }}</div>
+          <div class="growth-badge" [class.favorable]="growthMetrics()!.wants.isFavorable" [class.unfavorable]="!growthMetrics()!.wants.isFavorable">
+            <lucide-icon [name]="growthMetrics()!.wants.delta <= 0 ? icons.TrendingUp : icons.TrendingDown" size="14"></lucide-icon>
+            {{ growthMetrics()!.wants.delta > 0 ? '+' : '' }}{{ growthMetrics()!.wants.delta | number:'1.1-1' }}% vs last month
+          </div>
+        </div>
+
+        <div class="kpi-card savings">
+          <div class="kpi-header">
+            <div class="icon-box"><lucide-icon [name]="icons.Wallet" size="20"></lucide-icon></div>
+            <span class="target-chip">Budget: {{ formatCurrency(latestMonthStats()!.stats.totalIncome * (selectedStrategy().savings / 100)) }}</span>
+          </div>
+          <h3>Latest Saving</h3>
+          <div class="amount">{{ formatCurrency(latestMonthStats()!.stats.actualSavings) }}</div>
+          <div class="growth-badge" [class.favorable]="growthMetrics()!.savings.isFavorable" [class.unfavorable]="!growthMetrics()!.savings.isFavorable">
+            <lucide-icon [name]="growthMetrics()!.savings.delta >= 0 ? icons.TrendingUp : icons.TrendingDown" size="14"></lucide-icon>
+            {{ growthMetrics()!.savings.delta > 0 ? '+' : '' }}{{ growthMetrics()!.savings.delta | number:'1.1-1' }}% vs last month
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Charts Grid -->
+  <div class="main-grid">
+    <!-- Left Column -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="chart-card">
+        <h2>Budget Tracking ({{ selectedStrategy().needs }}/{{ selectedStrategy().wants }}/{{ selectedStrategy().savings
+          }})</h2>
+        <div id="budget-chart" style="min-height: 250px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h2>Financial Trends</h2>
+        <div id="trend-chart" style="min-height: 300px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h2>Budget Performance Trend (%)</h2>
+        <div id="performance-chart" style="min-height: 300px;"></div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="chart-card" style="height: 100%;">
+        <h2>Top Spending Categories</h2>
+        <div id="category-chart" style="min-height: 300px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <h2>Smart Insights</h2>
+        <div class="alerts-container">
+          @if (likelyStrategy() && likelyStrategy()?.id !== selectedStrategy().id) {
+          <div class="alert-item success" style="border-left-color: #eab308; background: rgba(234, 179, 8, 0.1);">
+            <lucide-icon [name]="icons.ArrowUpRight" size="18" style="color: #eab308;"></lucide-icon>
+            <span style="color: #f1f5f9;"><b>Strategy Match</b>: Your data most closely aligns with the <b>{{
+                likelyStrategy()?.name }}</b> framework.</span>
+          </div>
+          }
+
+          @if (stats().wantsRatio > selectedStrategy().wants) {
+          <div class="alert-item warning">
+            <lucide-icon [name]="icons.AlertCircle" size="18"></lucide-icon>
+            <span><b>Wants at {{ stats().wantsRatio | number:'1.0-0' }}%</b>: Over your chosen {{
+              selectedStrategy().wants }}% limit.</span>
+          </div>
+          } @else if (stats().totalIncome > 0) {
+          <div class="alert-item success">
+            <lucide-icon [name]="icons.TrendingUp" size="18"></lucide-icon>
+            <span>Want spending is within your strategy's limits.</span>
+          </div>
+          }
+
+          @if (stats().savingsRatio < selectedStrategy().savings && stats().totalIncome> 0) {
+            <div class="alert-item danger">
+              <lucide-icon [name]="icons.Wallet" size="18"></lucide-icon>
+              <span><b>Savings at {{ stats().savingsRatio | number:'1.0-0' }}%</b>: Below your {{
+                selectedStrategy().savings }}% target.</span>
+            </div>
+            } @else if (stats().totalIncome > 0) {
+            <div class="alert-item success">
+              <lucide-icon [name]="icons.TrendingUp" size="18"></lucide-icon>
+              <span>Savings target met or exceeded! Great discipline.</span>
+            </div>
+            }
+
+            @if (stats().netFlow < 0) { <div class="alert-item danger">
+              <lucide-icon [name]="icons.AlertCircle" size="18"></lucide-icon>
+              <span><b>Cash Outflow</b>: You spent more than you earned this period.</span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction Table -->
+<div class="table-card">
+  <div class="table-header">
+    <h2>Transactions History</h2>
+    <button class="upload-btn" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.75rem;">
+      <lucide-icon [name]="icons.Download" size="14"></lucide-icon> Export CSV
+    </button>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Narration</th>
+          <th>Category</th>
+          <th>Sub Category</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of filteredTransactions().slice(0, 100); track t.narration + t.date) {
+        <tr>
+          <td>{{ t.date | date:'dd MMM yyyy' }}</td>
+          <td style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+            [title]="t.narration">
+            {{ t.narration }}
+          </td>
+          <td><span style="color: #94a3b8; font-size: 0.75rem;">{{ t.category }}</span></td>
+          <td><span style="color: #94a3b8; font-size: 0.75rem;">{{ t.subCategory }}</span></td>
+          <td [style.color]="t.type === 'Expense' ? '#f87171' : '#34d399'" style="font-weight: 600;">
+            {{ formatCurrency(t.amount) }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+}
+</div>
